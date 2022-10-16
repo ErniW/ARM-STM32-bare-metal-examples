@@ -4,6 +4,8 @@ Basic examples of STM32 bare-metal programming.
 
 *If you've never programmed on MCU registers I suggest to see my bare metal AVR repository before going into STM32. I found that there aren't many resources that cover the very basics of STM32 without HAL. There is a huge gap between working with Arduino and without it, with ARM difficulty increases exponentially.*
 
+*Link to my AVR repository: https://github.com/ErniW/AVR-bare-metal-examples*
+
 *Examples and their code are made and changed gradually so functions may differ between examples.*
 
 ### Board:
