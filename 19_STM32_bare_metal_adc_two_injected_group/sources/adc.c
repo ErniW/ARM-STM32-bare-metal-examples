@@ -47,7 +47,7 @@ uint32_t adc_read(void){
 	return (ADC1->DR);
 }
 
-void ADC_IRQHandler(void){
+/*void ADC_IRQHandler(void){
 
 	if((ADC1->SR & SR_EOC) != 0){
 		ADC1->SR &=~ SR_EOC;
@@ -61,7 +61,7 @@ void ADC_IRQHandler(void){
         //adc_start_conversion();
         // delay_ms(10);
 	}
-}
+} */
 
 #define PA1_ADC_MODE (3 << 2)
 
@@ -98,13 +98,14 @@ void adc_init_two(){
     GPIOA->MODER |= PA1_ADC_MODE;
     RCC->APB2ENR |= ADC1EN;
     ADC1->CR2 |= CR2_ADON;
-    
-    ADC->CCR |= 3 << 16;
+
+    //ADC->CCR |= 20 << 8;
 }
 
 uint32_t adc_read_value(uint8_t channel){
 
     //kondensator do uziemienia? lub zwolnić tempo
+    //obczaić analog watchdog
 
     // RCC->APB2ENR |= ADC1EN;
     // ADC1->CR2 |= CR2_ADON;
@@ -124,3 +125,53 @@ uint32_t adc_read_value(uint8_t channel){
 
     return value;
 }
+
+
+//-------------------------------
+
+void adc_init_injected_group(){
+    GPIOA->MODER |= PA0_ADC_MODE;
+    GPIOA->MODER |= PA1_ADC_MODE;
+    RCC->APB2ENR |= ADC1EN;
+     ADC1->CR2 |= CR2_ADON;
+    ADC1->CR2 |= CR2_CONT;
+
+    ADC1->CR1 |= 1<<8;  
+
+    ADC1->CR2 |= 1 << 22; //start injected group
+
+    ADC1->JSQR |= 1 << 20; //length of 2 channels
+
+    ADC1->JSQR |= 0 << 10; //q3
+    ADC1->JSQR |= 1 << 15; //q4
+
+    ADC1->CR1 |= 1 << 12; 
+      //ADC_JEOCIE
+
+   
+    ADC1->CR1 |= 1<<7;  
+    //ADC1->CR1 |= CR1_EOCIE;
+    NVIC_EnableIRQ(ADC_IRQn);
+}
+
+
+#define SR_JEOC (1 << 2)
+
+void ADC_IRQHandler(void){
+    if((ADC1->SR & SR_JEOC) != 0){
+
+		ADC1->SR &=~ SR_JEOC;
+        printf("Working");
+        // values[0] = ADC_JDR3_JDATA;
+        // values[1] = ADC_JDR4_JDATA;
+
+        // values[0] = ADC1->JDR3;
+        // values[1] = ADC1->JDR4;
+        
+    }
+    printf("int");
+}
+
+// void adc_injected_group_read_value(){
+
+// }

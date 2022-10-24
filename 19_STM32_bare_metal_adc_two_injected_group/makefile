@@ -1,4 +1,4 @@
-PROJECT_NAME = adc_two_polling
+PROJECT_NAME = adc_two_injected_group
 BOARD = STM32F446xx
 MCU = cortex-m4
 

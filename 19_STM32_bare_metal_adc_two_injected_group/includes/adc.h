@@ -10,3 +10,5 @@ void adc_start_conversion();
 uint32_t adc_read_value(uint8_t channel);
 
 uint32_t adc_read();
+
+void adc_init_injected_group();
