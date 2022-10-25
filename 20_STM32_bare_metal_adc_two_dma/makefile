@@ -1,4 +1,4 @@
-PROJECT_NAME = adc_two_injected_group
+PROJECT_NAME = adc_two_dma
 BOARD = STM32F446xx
 MCU = cortex-m4
 
@@ -16,7 +16,7 @@ SRCS += ./sources/interrupt.c
 SRCS += ./sources/timer.c
 SRCS += ./sources/pwm.c
 SRCS += ./sources/serial.c
-#SRCS += ./sources/adc.c
+SRCS += ./sources/adc.c
 
 SRCS += $(STARTUP)
 SRCS += $(SYSTEM)

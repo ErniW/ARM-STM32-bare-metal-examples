@@ -1,177 +1,64 @@
+/*
+
 #include "../../STM32F446RE/stm32f4xx.h"
 #include "../../STM32F446RE/stm32f446xx.h"
 
 #include "adc.h"
-#include "sysTick.h"
 #include <stdio.h>
 
 #define PA0_ADC_MODE (3 << 0)
-#define ADC1EN (1U<<8)
-
-//#define ADC_CH1 (1U<<0)
-#define ADC_SEQ_LEN_1 0
-
-#define CR2_ADON (1U<<0)
-
-#define CR2_SWSTART (1U<<30)
-
-#define SR_EOC (1U<<1)
-#define CR2_CONT (1U<<1)
-
-#define CR1_EOCIE (1U<<5)
-
-void adc_init(){
-    GPIOA->MODER |= PA0_ADC_MODE;
-    RCC->APB2ENR |= ADC1EN;
-
-    ADC1->SQR3 = 1;
-	ADC1->SQR1 = ADC_SEQ_LEN_1;
-
-	ADC1->CR2 |= CR2_ADON;
-
-    // ADC1->CR1 |= CR1_EOCIE;
-
-	// NVIC_EnableIRQ(ADC_IRQn);
-
-   // ADC1->SMPR1 = 0;
-}
-
-void adc_start_conversion(void){
-	ADC1->CR2 |= CR2_CONT;
-	ADC1->CR2 |= CR2_SWSTART;
-}
-
-uint32_t adc_read(void){
-	while(!(ADC1->SR & SR_EOC)){}
-
-	return (ADC1->DR);
-}
-
-/*void ADC_IRQHandler(void){
-
-	if((ADC1->SR & SR_EOC) != 0){
-		ADC1->SR &=~ SR_EOC;
-
-		volatile uint32_t value = ADC1->DR;
-	    printf("%d\n\r", (int)value);
-
-        // if(ADC1->SQR3  == 0) ADC1->SQR3 = 1;
-        // else ADC1->SQR3 = 0;
-
-        //adc_start_conversion();
-        // delay_ms(10);
-	}
-} */
-
 #define PA1_ADC_MODE (3 << 2)
+#define ADC1EN (1 << 8)
+#define ADON (1 << 0)
 
-#define CH0 0
-#define CH1 1
+#define ADC_CLOCK_PRESCALER_8 (3 << 16)
 
-//na pałe single conversion, przełączyć kanał, rozpocząć konwersję.
-//spróbować użyć injected group
-//spróbować użyć dma
-// scan conversion mode
-//enable scan
-/*
-void adc_init_two(){
-    GPIOA->MODER |= PA0_ADC_MODE;
-    GPIOA->MODER |= PA1_ADC_MODE;
-    RCC->APB2ENR |= ADC1EN;
+#define SWSTART (1 << 30)
+#define JSWSTART (1 << 22)
+#define EOCIE (1 << 5)
+#define JEOCIE (1 << 7)
 
-    //ADC->CCR 
+#define SCAN_MODE (1 << 8)
+#define JAUTO (1 << 10)
+#define CONTINUOUS_MODE (1 << 1)
 
-    //ADC1->SQR3 |= CH0 | (CH1 << 5);
-    ADC1->SQR3 = 0;
-	ADC1->SQR1 = (1 << 20);
-
-	ADC1->CR2 |= CR2_ADON;
-
-        ADC1->CR1 |= CR1_EOCIE;
-
-
-	NVIC_EnableIRQ(ADC_IRQn);
-} */
-
-void adc_init_two(){
-    GPIOA->MODER |= PA0_ADC_MODE;
-    GPIOA->MODER |= PA1_ADC_MODE;
-    RCC->APB2ENR |= ADC1EN;
-    ADC1->CR2 |= CR2_ADON;
-
-    //ADC->CCR |= 20 << 8;
-}
-
-uint32_t adc_read_value(uint8_t channel){
-
-    //kondensator do uziemienia? lub zwolnić tempo
-    //obczaić analog watchdog
-
-    // RCC->APB2ENR |= ADC1EN;
-    // ADC1->CR2 |= CR2_ADON;
-
-    ADC1->SQR3 = channel;
-    ADC1->SQR1 = ADC_SEQ_LEN_1;
-    //ADC1->CR2 &=~ CR2_CONT;
-    ADC1->CR2 |= CR2_SWSTART;
-
-    while(!(ADC1->SR & SR_EOC)){};
-
-    volatile uint32_t value = ADC1->DR;
-
-    // RCC->APB2ENR &=~ ADC1EN;
-    // ADC1->CR2 &=~ CR2_ADON;
-    
-
-    return value;
-}
-
-
-//-------------------------------
+#define INJECTED_GROUP_NUMBER_OF_CHANNELS_2 (1 << 20)
+#define QUEUE3_CH0 ( 0 << 10)
+#define QUEUE4_CH1 (1 << 15)
 
 void adc_init_injected_group(){
     GPIOA->MODER |= PA0_ADC_MODE;
     GPIOA->MODER |= PA1_ADC_MODE;
     RCC->APB2ENR |= ADC1EN;
-     ADC1->CR2 |= CR2_ADON;
-    ADC1->CR2 |= CR2_CONT;
+    ADC->CCR |= ADC_CLOCK_PRESCALER_8;
+    ADC1->CR2 |= ADON;
 
-    ADC1->CR1 |= 1<<8;  
+    ADC1->JSQR |= INJECTED_GROUP_NUMBER_OF_CHANNELS_2;
+    ADC1->JSQR |= QUEUE3_CH0;
+    ADC1->JSQR |= QUEUE4_CH1;
 
-    ADC1->CR2 |= 1 << 22; //start injected group
+    ADC1->CR1 |= SCAN_MODE;  
+    ADC1->CR1 |= JAUTO;
+    ADC1->CR2 |= CONTINUOUS_MODE;
 
-    ADC1->JSQR |= 1 << 20; //length of 2 channels
-
-    ADC1->JSQR |= 0 << 10; //q3
-    ADC1->JSQR |= 1 << 15; //q4
-
-    ADC1->CR1 |= 1 << 12; 
-      //ADC_JEOCIE
-
+    ADC1->CR2 |= SWSTART;
+    ADC1->CR2 |= JSWSTART;
    
-    ADC1->CR1 |= 1<<7;  
-    //ADC1->CR1 |= CR1_EOCIE;
+    ADC1->CR1 |= EOCIE;
+    ADC1->CR1 |= JEOCIE;  
+    
     NVIC_EnableIRQ(ADC_IRQn);
 }
 
-
-#define SR_JEOC (1 << 2)
-
 void ADC_IRQHandler(void){
-    if((ADC1->SR & SR_JEOC) != 0){
+    if(ADC1->SR & ADC_SR_JEOC){
 
-		ADC1->SR &=~ SR_JEOC;
-        printf("Working");
-        // values[0] = ADC_JDR3_JDATA;
-        // values[1] = ADC_JDR4_JDATA;
+        volatile uint32_t values[2];
+        values[0] = ADC1->JDR3;
+        values[1] = ADC1->JDR4;
 
-        // values[0] = ADC1->JDR3;
-        // values[1] = ADC1->JDR4;
-        
+       
+
+        ADC1->SR &=~ ADC_SR_JEOC;
     }
-    printf("int");
-}
-
-// void adc_injected_group_read_value(){
-
-// }
+} */
