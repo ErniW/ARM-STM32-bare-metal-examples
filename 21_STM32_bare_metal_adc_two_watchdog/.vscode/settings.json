@@ -1,0 +1,11 @@
+{
+    "files.associations": {
+        "stm32f4xx.h": "c",
+        "stm32f446xx.h": "c",
+        "pll.h": "c",
+        "system_stm32f4xx.h": "c",
+        "timer.h": "c",
+        "pwm.h": "c",
+        "serial.h": "c"
+    }
+}
