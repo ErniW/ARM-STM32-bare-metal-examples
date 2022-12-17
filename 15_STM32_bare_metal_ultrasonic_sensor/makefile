@@ -1,4 +1,4 @@
-PROJECT_NAME = servo
+PROJECT_NAME = Ultrasonic
 BOARD = STM32F446xx
 MCU = cortex-m4
 

@@ -13,7 +13,7 @@
 
 #define CC1F_INT (1 << 1)
 
-volatile int timestamp = 0;
+// volatile int timestamp = 0;
 
 int main(){
 
@@ -39,11 +39,22 @@ int main(){
     
     while(1){
 
-        while(!(TIM1->SR & (1<<2))){};
-        timestamp = TIM1->CCR2;
-        timestamp /= 10;
-        TIM1->CNT = 0;
-        printf("%d\n", timestamp);
+    };
+}
+
+int __io_putchar(char ch){
+	tx_send(ch);
+	return ch;
+}
+
+
+        // while(!(TIM1->SR & (1<<2))){};
+        // timestamp = TIM1->CCR2;
+        // timestamp /= 10;
+        // TIM1->CNT = 0;
+        // printf("%d\n", timestamp);
+
+
         //TIM1->CR1 |= 1;
        
 
@@ -71,10 +82,3 @@ int main(){
         // volatile int value = ultrasonic_measure_distance();
         // while(!(TIM1->SR &  CC1F_INT)){}
         // printf("test");
-    };
-}
-
-int __io_putchar(char ch){
-	tx_send(ch);
-	return ch;
-}

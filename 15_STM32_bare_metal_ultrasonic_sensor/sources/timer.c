@@ -31,6 +31,10 @@ void timer_init(){
     __enable_irq();
 }
 
+volatile int timestamp = 0;
+
+#define CC2IF (1 << 2)
+
 void TIM2_IRQHandler(void) {
     if (TIM2->SR & TIM_SR_UIF) {
         TIM2->SR &=~ TIM_SR_UIF;
@@ -93,6 +97,7 @@ void button_switch_after_second_init(){
 void button_measure_press_time_init(){
    __disable_irq();
 
+//RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN_Msk;
    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
    GPIOA->MODER |= (1 << 19);
    GPIOA->AFR[1] |= (1 << 4);
@@ -105,8 +110,23 @@ void button_measure_press_time_init(){
    TIM1->CCER |= (5<<5);
    TIM1->CCER |= (1<<4);
    //TIM1->CR1 |=  TIM_CR1_OPM;
+
+    TIM1->DIER |= (1 << 2);
+
+    NVIC_EnableIRQ(TIM1_CC_IRQn);
+
    TIM1->CR1 |= TIM_CR1_CEN;
    __enable_irq();
+}
+
+
+void TIM1_CC_IRQHandler(void){
+    if(TIM1->SR & CC2IF){
+        timestamp = TIM1->CCR2;
+        timestamp /= 10;
+        TIM1->CNT = 0;
+        printf("%d\n", timestamp);
+    }
 }
 
 //#define CC1F_INT (1 << 1)
@@ -126,7 +146,7 @@ void ultrasonic_timer_init(){
 }
 
 void ultrasonic_measure(){
-    
+
 }
 
 //D5 /D4 to PB4/ PB5 to TIM3CH1 / -
