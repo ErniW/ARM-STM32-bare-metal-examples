@@ -6,6 +6,6 @@
         "system_stm32f4xx.h": "c",
         "timer.h": "c",
         "pwm.h": "c",
-        "stdbool.h": "c"
+        "serial.h": "c"
     }
 }

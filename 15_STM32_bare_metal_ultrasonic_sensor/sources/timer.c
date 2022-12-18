@@ -5,6 +5,7 @@
 #include "pll.h"
 #include "systick.h"
 #include "stdio.h"
+#include<stdbool.h>
 
 void timer_init(){
     __disable_irq();
@@ -31,7 +32,7 @@ void timer_init(){
     __enable_irq();
 }
 
-volatile int timestamp = 0;
+int timestamp = 0;
 
 #define CC2IF (1 << 2)
 
@@ -111,7 +112,7 @@ void button_measure_press_time_init(){
    TIM1->CCER |= (1<<4);
    //TIM1->CR1 |=  TIM_CR1_OPM;
 
-    TIM1->DIER |= (1 << 2);
+     TIM1->DIER |= (1 << 2);
 
     NVIC_EnableIRQ(TIM1_CC_IRQn);
 
@@ -119,15 +120,88 @@ void button_measure_press_time_init(){
    __enable_irq();
 }
 
+#define CC1IF (1 << 1)
 
+void pre_count_timer(){
+//    // TIM1->CCMR1 |= (1<<8);
+//     RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
+//     TIM1->PSC = ((APB2_FREQ * 2) / 10000) - 1;
+//    TIM1->CCR1 = 5000;
+//    //TIM1->ARR = 40000;
+//    TIM1->CCMR1 |= (1 << 4) | (1 << 7);
+//      TIM1->BDTR |= TIM_BDTR_MOE;
+// TIM1->CCER |= (1<<0);
+   
+//    TIM1->EGR  |= (1<<1);
+//     TIM1->DIER |= (1 << 1) ;
+
+//    TIM1->CR1 |= TIM_CR1_CEN;
+//     NVIC_EnableIRQ(TIM1_CC_IRQn);
+//     TIM1->CNT = 0;
+
+/*
+
+Procedure:
+1. Select the counter clock (internal, external, prescaler).
+2. Write the desired data in the TIMx_ARR and TIMx_CCRx registers.
+3. Set the CCxIE bit if an interrupt request is to be generated.
+4. Select the output mode. For example:
+– Write OCxM = 011 to toggle OCx output pin when CNT matches CCRx
+– Write OCxPE = 0 to disable preload register
+– Write CCxP = 0 to select active high polarity
+– Write CCxE = 1 to enable the output
+5. Enable the counter by setting the CEN bit in the TIMx_CR1 register
+*/
+
+    RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
+    TIM1->PSC = ((APB2_FREQ * 2) / 10000) - 1;
+    //TIM1->ARR = 10000;
+    
+    TIM1->DIER |= (1 << 1) | (1<<0);
+    TIM1->CCMR1 |= (3 << 4);
+    TIM1->CCMR1 &=~ (1 << 3);
+    TIM1->CCER |= (1<<1);
+    TIM1->CCER &=~ (1<<0);
+
+    TIM1->CCR1 = 30000;
+    TIM1->CR1 |= 1;
+    TIM1->CNT = 0;
+    NVIC_EnableIRQ(TIM1_CC_IRQn);
+
+}
+/*
 void TIM1_CC_IRQHandler(void){
     if(TIM1->SR & CC2IF){
+        TIM1->SR  &=~ CC2IF;
         timestamp = TIM1->CCR2;
         timestamp /= 10;
-        TIM1->CNT = 0;
+        //TIM1->CNT = 0;
         printf("%d\n", timestamp);
+        // if (timestamp > 6000) {
+        //     //TIM1->DIER &=~ (1 << 2);
+        //     TIM1->CCR2 = 0;
+        //     TIM1->SR  &=~ CC2IF;
+        //     timestamp = 0;
+        // }
     }
-}
+        // uint32_t a = TIM1->CNT;
+      
+        //  printf("%d, %ld\n", TIM1->CCR1, a);
+
+    if(TIM1->SR & CC1IF){
+        TIM1->SR  &=~ CC1IF;
+         //uint32_t a = TIM1->CNT;
+        
+         printf("DONE\n");
+        
+        //  TIM1->DIER &=~ (1 << 2);
+        //  TIM1->CCER &=~ (1 << 0);
+        // TIM1->SR  &=~ CC2IF;
+         //TIM1->CCR2 = 0;
+       // TIM1->CNT = 0;
+    }
+} 
+*/
 
 //#define CC1F_INT (1 << 1)
 
@@ -140,72 +214,178 @@ void TIM1_CC_IRQHandler(void){
 // }
 
 
-
-void ultrasonic_timer_init(){
-
-}
-
-void ultrasonic_measure(){
-
-}
-
-//D5 /D4 to PB4/ PB5 to TIM3CH1 / -
-
-//PB4 AF2
-
-// 1mhz to jest okres 1 us
-
 /*
+    1. ustawienie timera na 1 mhz
+    2. Wyślij sygnał przez 10us
+    3. ustaw counter na 0.
+    4. Mierz czas.
 
-    How to make it work:
-    1. Send 10 us pulse (set systick delay to 10 us)
-    2. Set timer to receive value
-
-    Jak mierzyć rising edge and falling edge (zmiana polaryzacji)
 */
 
 
-// void ultrasonic_timer_init(){
+void ultrasonic_timer_init(){
+   __disable_irq();
 
-//     GPIOB->MODER |= (1 << 10);
+//RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN_Msk;
+   RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+   GPIOA->MODER |= (1 << 19);
+   GPIOA->AFR[1] |= (1 << 4);
 
-//     // GPIOB->MODER |= (1 << 9);
-//     // GPIOB->AFR[0] |= (2 << 20);
+   GPIOA->MODER |= (1 << 16);
 
-//     RCC->APB1ENR |= RCC_APB1ENR_TIM3EN;
+   RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
 
-//     TIM3->CR1 &=~ TIM_CR1_CEN;
-//     TIM3->CR1 |=  TIM_CR1_OPM;
+   //TIM1->PSC = ((APB2_FREQ * 2) / 10000) - 1;
+    //TIM1->PSC = ((APB2_FREQ * 2) / 180) - 1;
 
-//     TIM3->PSC = ((APB1_FREQ) * 2 / 10000) - 1;
-//     TIM3->ARR = 0xFFFF;
-//     TIM3->CNT = 0;
+    TIM1->PSC = 180 - 1;
 
-//     TIM3->EGR  |= TIM_EGR_UG;
-//     //TIM3->DIER |= TIM_DIER_UIE;
+   TIM1->CCMR1 |= (1<<8);
+   TIM1->CCER |= (5<<5);
+   TIM1->CCER |= (1<<4);
+   //TIM1->CR1 |=  TIM_CR1_OPM;
 
-//     TIM3->CR1 |= TIM_CR1_CEN;
+    //  TIM1->DIER |= (1 << 2);
 
-//     //NVIC_EnableIRQ(TIM3_IRQn);
-//     SYSCFG->EXTICR[1] |= (1<< 1);
-// }
+    // NVIC_EnableIRQ(TIM1_CC_IRQn);
 
-// volatile uint16_t time = 0;
+   TIM1->CR1 |= TIM_CR1_CEN;
+   __enable_irq();
+}
 
-
-
-// int ultrasonic_measure_distance(){
-//     GPIOB->ODR |= (1 << 5);
-//     delay_ms(20);
-//     GPIOB->ODR &=~ (1 << 5);
-//     TIM3->CNT = 0;
-//     TIM3->CR1 |= TIM_CR1_CEN;
-
-// };
-
-// void TIM3_IRQHandler(void) {
-//     if (TIM3->SR & TIM_SR_UIF) {
-//         TIM3->SR &=~ TIM_SR_UIF;
-//         time = TIM3->CNT;
+// void TIM1_CC_IRQHandler(void) {
+//     if (TIM1->SR & CC2IF) {
+//         TIM1->SR &=~ CC2IF;
+        
 //     }
 // }
+
+volatile int distance = 0;
+
+volatile int timestamp2 = 0;
+
+void ultrasonic_measure(){
+    // printf("Start\n");
+    TIM1->SR &=~ CC2IF;
+    GPIOA->ODR |= (1 << 8);
+    TIM1->CNT = 0;
+    while(TIM1->CNT != 10){};
+    GPIOA->ODR &=~ (1 << 8);
+    // printf("Sent\n");
+    while(!(TIM1->SR & CC2IF));
+    timestamp = TIM1->CCR2;
+    // printf("A %d\n", timestamp);
+    while(!(TIM1->SR & CC2IF));
+    timestamp2 = TIM1->CCR2;
+    //  printf("B %d\n", timestamp2);
+    
+     distance =  timestamp2 - timestamp;
+     distance = distance * 0.034 / 2;
+     printf("%d\n", distance);
+}
+
+int getDist(){
+    return distance;
+}
+
+void ultrasonic_init_interrupt(){
+    __disable_irq();
+
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+    GPIOA->MODER |= (1 << 19);
+    GPIOA->AFR[1] |= (1 << 4);
+
+    GPIOA->MODER |= (1 << 16);
+
+    RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;
+    TIM1->PSC = 180 - 1;
+
+    TIM1->CCMR1 |= (1<<8);
+    TIM1->CCER |= (5<<5);
+    TIM1->CCER |= (1<<4);
+    TIM1->DIER |= (1 << 2);
+
+    TIM1->DIER |= (1 << 1) | (1<<0);
+    TIM1->CCMR1 |= (3 << 4);
+    TIM1->CCMR1 &=~ (1 << 3);
+    TIM1->CCER |= (1<<1);
+    TIM1->CCER &=~ (1<<0);
+     TIM1->CCR1 = 10;
+
+    TIM1->CR1 |= TIM_CR1_CEN;
+
+    NVIC_EnableIRQ(TIM1_CC_IRQn);
+    __enable_irq();
+}
+
+bool measureEdge = false;
+volatile bool trig = false;
+
+void TIM1_CC_IRQHandler(void) {
+    if (TIM1->SR & CC2IF) {
+        TIM1->SR &=~ CC2IF;
+        if(!measureEdge){
+            //  TIM1->CNT = 0;
+            timestamp = TIM1->CCR2;
+            measureEdge = true;
+            //TIM1->CNT = 0;
+            //  printf("Rising\n");
+        }
+        else{
+            timestamp2 = TIM1->CCR2;
+            distance = timestamp2 - timestamp;
+            distance = distance * 0.034 / 2;
+
+            if(distance < 0) distance = 0;
+            measureEdge = false;
+            //  printf("Falling\n");
+            printf("%d\n",distance);
+            // TIM1->CNT = 0;
+            TIM1->CR1 &=~ TIM_CR1_CEN;
+            //trig = true;
+            TIM1->SR &=~ CC1IF;
+        }   
+    }
+
+    else if((TIM1->SR & CC1IF) ){
+        //TIM1->SR &=~ CC1IF;
+        GPIOA->ODR &=~ (1 << 8);
+       // TIM1->DIER &=~ (1 << 1);
+       //TIM1->CCER &=~ 1;
+        //  printf("send stop\n");
+        
+    }
+
+    if(TIM1->SR & TIM_SR_UIF){
+        TIM1->SR &=~ TIM_SR_UIF;
+        // TIM1->SR &=~ CC2IF;
+        // TIM1->SR &=~ CC1IF;
+        // printf("%d %d overflow\n", timestamp, timestamp2);
+        //TIM1->CCR2 = 0;
+        // distance = 0;
+        //measureEdge = false;
+        TIM1->CR1 &=~ TIM_CR1_CEN;
+    }
+}
+
+void ultrasonic_start_measure(){
+    //  printf("send----------\n");
+    //  TIM1->DIER |= (1 << 1);
+
+    TIM1->CR1 |= TIM_CR1_CEN;
+    measureEdge = false;
+    
+    TIM1->CNT = 0;
+    GPIOA->ODR |= (1 << 8);
+
+    
+    
+
+    // TIM1->CR1 |= TIM_CR1_CEN;
+    // TIM1->CNT = 0;
+
+    // GPIOA->ODR |= (1 << 8);
+    // while(TIM1->CNT != 10);
+    // GPIOA->ODR &=~ (1 << 8);
+    
+}

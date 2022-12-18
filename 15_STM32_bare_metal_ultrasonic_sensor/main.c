@@ -22,23 +22,26 @@ int main(){
    
     
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;  
-    // RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;
      tx_init();
-   // ultrasonic_timer_init();
-   //button_switch_after_second_init();
-//    button_measure_press_time_init();
 
-    // RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
-    // RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN;
+    ultrasonic_timer_init();
 
-    // GPIOA->MODER |= (1U<<10);
-    // //GPIOA->PUPDR |= (1 << 26);
-    // GPIOA->PUPDR |= (1 << 18);
-    timer_init();
-    button_measure_press_time_init();
-    
+    ultrasonic_init_interrupt();
+
+    unsigned long prevTime = 0;
+
     while(1){
+        unsigned long time = getMillis();
 
+        if(time - prevTime > 100){
+
+            ultrasonic_start_measure();
+
+            prevTime = time;
+        }
+
+        // ultrasonic_measure();
+        // delay_ms(80);
     };
 }
 
