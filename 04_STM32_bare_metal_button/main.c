@@ -3,22 +3,25 @@
 
 #include "pll.h"
 
+#define PA5_OUTPUT  (1 << 10)
+#define LED_PIN     (1 << 5)
+#define BUTTON_PIN  (1 << 13)
+
 int main(){
 
     clockSpeed_PLL();
 
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN_Msk;
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOCEN_Msk;
-
-	GPIOA->MODER |= (1U<<10);  
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN;
+	GPIOA->MODER |= PA5_OUTPUT;  
 
 	while(1){
         
-        if(GPIOC->IDR & (1U << 13)){
-            GPIOA -> ODR |= (1U << 5);
+        if(GPIOC->IDR & BUTTON_PIN){
+            GPIOA->ODR &=~ LED_PIN;
         }
         else{
-            GPIOA -> ODR &=~ (1U << 5);
+            GPIOA->ODR |= LED_PIN;
         }
+        
 	}
 }

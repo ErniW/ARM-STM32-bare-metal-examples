@@ -1,4 +1,4 @@
-PROJECT_NAME = button_switch
+PROJECT_NAME = button_and_millis
 BOARD = STM32F446xx
 MCU = cortex-m4
 

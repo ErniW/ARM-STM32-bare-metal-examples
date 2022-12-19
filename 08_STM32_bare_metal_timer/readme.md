@@ -22,9 +22,9 @@ To create a simple 1 second blink we can create a timer with frequency of 1 Hz.
 
 Because PLL sets APB1_FREQ to 45MHz, the APB1 prescaler equals 4 therfore our timer frequency equals 90 MHz.
 
-If our prescaler is set to `90000000 / 10000 -> 9000 - 1` 
+If our prescaler is set to `90000000 / 10000 -> 9000 - 1` it means our clock is set to 10KHz. **So the timer will reach 1 second after `10000` ticks.**
 
-2. Clear the counter when it reaches 0. `TIM2->CNT = 0;`
+2. Set the `ARR` to 10000-1 so it will reload with each second.
 
 3. Enable the timer in `TIM2->CR1` control register.
 
@@ -36,7 +36,8 @@ If our prescaler is set to `90000000 / 10000 -> 9000 - 1`
 
 ### Timer interrupt.
 
-1. Set the update generation in **TIMx event generation register** `TIM2->EGR`.
-2. Enable update event interrupt `TIM2->DIER`.
-3. Enable `TIM2_IRQn` in NVIC.
-4. Now create the `TIM2_IRQHandler`. We have to clear the `TIM_SR_UIF` manually each time this interrupt occurs.
+1. Enable update event interrupt `TIM2->DIER`.
+2. Enable `TIM2_IRQn` in NVIC.
+3. Now create the `TIM2_IRQHandler`. We have to clear the `TIM_SR_UIF` manually each time this interrupt occurs.
+
+*When setting any interrupt in a function you should `__disable_irq` and `__enable_irq` to be sure it's configured without any interruption. Interrupt-safe code is a huge thing in embedded development.*

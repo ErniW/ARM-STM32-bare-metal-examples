@@ -4,17 +4,20 @@
 #include "pll.h"
 #include "sysTick.h"
 
+#define PA5_OUTPUT  (1 << 10)
+#define LED_PIN     (1 << 5)
+
 int main(){
 
     clockSpeed_PLL();
     SysTick_Init();
 
-    RCC->AHB1ENR |= 1;
-	GPIOA->MODER |= (1U<<10);  
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
+	GPIOA->MODER |= PA5_OUTPUT;
 
 	while(1){
 
-        GPIOA -> ODR ^= (1U<<5);
+        GPIOA->ODR ^= LED_PIN;
         delay_ms(1000);
 
 	}
