@@ -18,27 +18,27 @@ int main(){
 
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN;
     RCC->APB2ENR |= RCC_APB2ENR_SYSCFGEN;
-    
-	GPIOA->MODER |= PA5_OUTPUT;  
+
+    GPIOA->MODER |= PA5_OUTPUT;  
 
     __disable_irq();
 
     SYSCFG->EXTICR[3] |= EXTI_C13;
     EXTI->IMR |= BUTTON_PIN;
-	EXTI->FTSR |= BUTTON_PIN;
+    EXTI->FTSR |= BUTTON_PIN;
 
     NVIC_EnableIRQ(EXTI15_10_IRQn);
 
     __enable_irq();
 
-	while(1){
+    while(1){
 
-	}
+    }
 }
 
 void EXTI15_10_IRQHandler(void){
-	if(EXTI->PR & BUTTON_PIN){
-	    EXTI->PR |= BUTTON_PIN;
-		GPIOA->ODR ^= LED_PIN;
-	}
+    if(EXTI->PR & BUTTON_PIN){
+        EXTI->PR |= BUTTON_PIN;
+        GPIOA->ODR ^= LED_PIN;
+    }
 }

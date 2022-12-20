@@ -14,11 +14,11 @@ int main(){
     clockSpeed_PLL();
 
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN;
-	GPIOA->MODER |= PA5_OUTPUT;  
+    GPIOA->MODER |= PA5_OUTPUT;  
 
     bool buttonPrevState = false;
 
-	while(1){
+    while(1){
         
         bool buttonState = GPIOC->IDR & BUTTON_PIN;
 
@@ -27,5 +27,5 @@ int main(){
         }
 
         buttonPrevState = buttonState;
-	}
+    }
 }

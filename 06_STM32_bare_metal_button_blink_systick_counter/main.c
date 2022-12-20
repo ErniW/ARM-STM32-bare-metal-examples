@@ -16,11 +16,11 @@ int main(){
     SysTick_Init();
 
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN;
-	GPIOA->MODER |= PA5_OUTPUT;  
+    GPIOA->MODER |= PA5_OUTPUT;  
 
     volatile uint32_t prevMillis = 0;
 
-	while(1){
+    while(1){
         
         volatile uint32_t millis = getMillis();
 
@@ -32,5 +32,5 @@ int main(){
         if(!(GPIOC->IDR & BUTTON_PIN)){
             GPIOA->ODR |= LED_PIN;
         }
-	}
+    }
 }

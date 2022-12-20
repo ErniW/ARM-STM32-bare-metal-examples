@@ -12,9 +12,9 @@ int main(){
     clockSpeed_PLL();
 
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN | RCC_AHB1ENR_GPIOCEN;
-	GPIOA->MODER |= PA5_OUTPUT;  
+    GPIOA->MODER |= PA5_OUTPUT;  
 
-	while(1){
+    while(1){
         
         if(GPIOC->IDR & BUTTON_PIN){
             GPIOA->ODR &=~ LED_PIN;
@@ -23,5 +23,5 @@ int main(){
             GPIOA->ODR |= LED_PIN;
         }
         
-	}
+    }
 }

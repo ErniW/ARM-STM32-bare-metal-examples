@@ -19,5 +19,5 @@ void rx_init(){
 
 char rx_read(){
     while(!(USART2->SR & USART_SR_RXNE)){};
-	return USART2->DR;
+    return USART2->DR;
 }

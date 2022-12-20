@@ -15,18 +15,18 @@ int main(){
 
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
     GPIOA->MODER |= PA5_OUTPUT;
-    
-    rx_init();
-     
-    while(1){
-		char key = rx_read();
 
-		if(key == 'A'){
-			GPIOA->ODR |= LED_PIN;
-		}
-		else if(key == 'B'){
+    rx_init();
+        
+    while(1){
+        char key = rx_read();
+
+        if(key == 'A'){
+            GPIOA->ODR |= LED_PIN;
+        }
+        else if(key == 'B'){
             GPIOA->ODR &=~ LED_PIN;
-		}
+        }
 
     };
 }

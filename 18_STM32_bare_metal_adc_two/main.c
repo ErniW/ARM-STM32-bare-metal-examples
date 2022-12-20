@@ -28,6 +28,6 @@ int main(){
 }
 
 int __io_putchar(int ch){
-	tx_send(ch);
-	return ch;
+    tx_send(ch);
+    return ch;
 }

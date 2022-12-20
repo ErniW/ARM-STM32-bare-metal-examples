@@ -7,9 +7,9 @@
 int main(){
 
     RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;
-	GPIOA->MODER |= PA5_OUTPUT;
+    GPIOA->MODER |= PA5_OUTPUT;
 
-	while(1){
+    while(1){
 
         GPIOA->ODR ^= LED_PIN;
 
@@ -17,6 +17,6 @@ int main(){
 
         };
 
-	}
+    }
 
 }

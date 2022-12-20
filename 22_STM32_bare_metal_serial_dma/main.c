@@ -74,10 +74,10 @@ int main(){
 // }
 
 void DMA1_Stream6_IRQHandler(void){
-	if(DMA1->HISR & DMA_HISR_TCIF6){
-		DMA1->HIFCR |= DMA_HIFCR_CTCIF6;
+    if(DMA1->HISR & DMA_HISR_TCIF6){
+        DMA1->HIFCR |= DMA_HIFCR_CTCIF6;
         DMA1->HIFCR |= DMA_HIFCR_CFEIF6 | (15 << 18);
-	}
+    }
 }
 
 void DMA1_Stream5_IRQHandler(void){
@@ -90,6 +90,6 @@ void DMA1_Stream5_IRQHandler(void){
 
 
 int __io_putchar(int ch){
-	tx_send(ch);
-	return ch;
+    tx_send(ch);
+    return ch;
 }
