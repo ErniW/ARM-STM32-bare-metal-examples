@@ -1,7 +1,2 @@
-## Serial receive interrupt
-The only difference is enabling the interrupt:
-
-    USART2->CR1 |= CR1_RXNEIE;
-	NVIC_EnableIRQ(USART2_IRQn);
-
-After that include `USART2_IRQHandler` which will toggle the LED when "x" is received.
+## Serial transmit
+It's similar to RX in configuration. To send many chars you can use for loop. It's a very basic implementation.

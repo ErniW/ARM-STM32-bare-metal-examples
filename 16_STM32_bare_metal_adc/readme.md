@@ -1,7 +1,7 @@
 ## ADC
 Connect the potentiometer to port `PA0` which is equivalent of Arduino pin A0.
 
-*Important: connect power source to 3V. Otherwise the value will overflow.*
+*Important: connect power source to 3V. Otherwise the value will overflow. The value range is 0-4095*
 
 ### Enabling the ADC:
 1. Set `PA0` to analog input.

@@ -5,4 +5,4 @@ void rx_interrupt_init();
 char rx_read();
 
 void tx_init();
-void tx_send(int c);
+void tx_send(char c);

@@ -1,7 +1,6 @@
 #include "../STM32F446RE/stm32f4xx.h"
 #include "../STM32F446RE/stm32f446xx.h"
 
-#include<stdbool.h>
 #include<stdio.h>
 
 #include "pll.h"
@@ -14,22 +13,18 @@ int main(){
     clockSpeed_PLL();
     SysTick_Init();
 
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN_Msk;
-
     tx_init();
     adc_init();
 
     adc_start_conversion();
 
-    volatile uint32_t value;
-
     while(1){
-        value = adc_read();
+        uint32_t value = adc_read();
         printf("Sensor value : %d \n\r", (int)value);
     };
 }
 
-int __io_putchar(int ch){
+int __io_putchar(char ch){
 	tx_send(ch);
 	return ch;
 }

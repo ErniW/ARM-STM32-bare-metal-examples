@@ -12,10 +12,8 @@ STLINK_DIR = ../stlink/bin
 SRCS = main.c
 SRCS += ./sources/pll.c
 SRCS += ./sources/sysTick.c
-SRCS += ./sources/interrupt.c
-SRCS += ./sources/timer.c
-SRCS += ./sources/pwm.c
 SRCS += ./sources/serial.c
+SRCS += ./sources/ultrasonic.c
 
 SRCS += $(STARTUP)
 SRCS += $(SYSTEM)

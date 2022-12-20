@@ -12,9 +12,9 @@
 #define PA9_AF2         (1 << 4)
 #define PA10_AF2        (1 << 8)
 
-#define PA8_PWM_MODE_1  (6 << 4)
-#define PA9_PWM_MODE_1  (6 << 12)
-#define PA10_PWM_MODE_1 (6 << 4)
+#define CH1_PWM_MODE_1  (6 << 4)
+#define CH2_PWM_MODE_1  (6 << 12)
+#define CH3_PWM_MODE_1  (6 << 4)
 
 int main(){
 
@@ -29,10 +29,10 @@ int main(){
    
     TIM1->CCER |= TIM_CCER_CC1E | TIM_CCER_CC2E | TIM_CCER_CC3E;
 
-    TIM1->CCMR1 |= PA8_PWM_MODE_1 | PA9_PWM_MODE_1;
-    TIM1->CCMR2 |= PA10_PWM_MODE_1;
+    TIM1->CCMR1 |= CH1_PWM_MODE_1 | CH2_PWM_MODE_1;
+    TIM1->CCMR2 |= CH3_PWM_MODE_1;
 
-    //TIM1->BDTR |= TIM_BDTR_MOE;
+    TIM1->BDTR |= TIM_BDTR_MOE;
 
     TIM1->ARR = 255;
     TIM1->CR1 |= TIM_CR1_CEN;
@@ -55,21 +55,3 @@ int main(){
         delay_ms(10);
     };
 }
-
-
-/*void pwm_rgb_init(){
-    GPIOA->AFR[1] |= (1 << 0) | (1 << 4) | (1 << 8);
-    GPIOA->MODER |= (2 << 16) | (2 << 18) | (2 << 20);
-
-    TIM1->CCER |= (1 << 0) | (1 << 4) | (1 << 8);
-
-    TIM1->CCMR1 |= (6 << 4);
-    TIM1->CCMR1 |= (6 << 12);
-    TIM1->CCMR2 |= (6 << 4);
-    TIM1->BDTR |= TIM_BDTR_MOE;
-    
-    TIM1->PSC = 0;
-    TIM1->ARR = 255;
-    TIM1->CNT = 0;
-    TIM1->CR1 |= 1;
-}*/

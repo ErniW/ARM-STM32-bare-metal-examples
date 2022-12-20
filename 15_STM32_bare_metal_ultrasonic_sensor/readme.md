@@ -1,23 +1,24 @@
-## Servo
-*Control the SG-90 servo via PWM signal with different period.*
+## HC-SR04
+**The code provides two versions: blocking and non-blocking with interrupts (because many things can be done meanwhile). Later it could use additional timer to automatically check for new value instead of measuring time interval with getMillis.**
 
-### SG-90 servo control parameters:
-- **Frequency: 50Hz**
-- **Period: (related to frequency): 20ms.**
-- **Pulse width: 0.5 - 2.5ms.** *It's not 1-2 ms (a commonly used range for all servos), many people didn't even bother to check that posting their tutorials or code snippets. Always check the specs of your servo.*
+Connect the `Trig` Pin to `PA8` and `Echo` to `PA9`.
 
-### Angle/Period relation:
-- Angle 0 should be 0.5ms.
-- Angle 90 should be 1.5ms.
-- Angle 180 should be 2.5ms.
+### How ultrasonic sensor works:
+1. Send 10us ultrasonic pulse through Trig pin.
+2. Wait until the pulse returns. 
+3. Echo pin returns high signal corresponding to time of flight. 
+4. We can compute the distance according to formula `duration * speed of sound / 2`. *Remember to use correct units!*
 
-### Calculating the correct timer frequency:
-Our Timer clock frequency is equal to 90MHz. To set it to 50Hz we must set correct prescaler. Before that, connect Servo signal pin to `PA5` which is bound to **Timer 2 Channel 1.**
+### Timer requirements:
+- Timing should be done at microseconds scale. So setting prescaler to `180 - 1` will make our timer work at **1Mhz frequency and a period of 1us.** *It's 180 and not 90 because of formula mentioned in one of previous timer examples.*
+- To read the length of received pulse, set Timer channel as input. *The same method can be used to measure length of a button press.*
+- We can set another channel to measure 10us and send the Trigger pulse.
 
-1. Set the `PA5` mode to Alternate Function in `MODER` register and enable Timer 2 channel 1 in **Alternate Function Register**. Remember to enable `AHB1` and `APB1` buses.
-2. Set the prescaler to `90 - 1` so the timer frequency is now 1 MHz.
-3. `TIM2->ARR` is responsible for wave frequency. It reloads the counter when a certain amount of clock ticks occur. `1Mhz / 20000Hz = 50Hz`. The period equals 20ms.
-4. *You can use PWM duty cycle equation to calculate the percentage of period, however I'm just hardcoding values that corresponds to angle 0, 90 and 180.*
-5. *Because of Servo's physicality, we need to give it some time to move into desired position.*
+### Interrupts:
+For each measurements, we actually need four interrupts to happen:
+1. Start the Trig pulse. Count 10us to stop the signal.
+2. Measure the timestamp of rising edge when our returning signal on Echo pin.
+3. Measure another timestamp of falling edge, substract them to eventually get the distance. *Theoretically you can set a PWM input measurement.*
+4. Return 0 when overflow occurs. *TODO: Better handling of timeouts*
 
-*While servo is moving you can see the build-in LED changing its brightness.*
+*In this example we are using `__io_putchar` to send chars with printf function.*

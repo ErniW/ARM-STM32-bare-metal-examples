@@ -1,2 +1,2 @@
-## ADC Direct Memory Access (DMA)
-Connect two potentiometers in ports `PA0` and `PA1`.
+## ADC Watchdog
+It's a feature to immediately respond with interrupt to an event when selected ADC channel exceeded a selected boundary.
