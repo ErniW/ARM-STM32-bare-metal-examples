@@ -8,6 +8,13 @@ Basic examples of STM32 bare-metal programming.
 
 *Examples and their code are made and changed gradually so functions may differ between examples.*
 
+**TODO**
+- Fix the DMA serial bi-directional communication.
+- I2C interrupts (and DMA?).
+- SPI.
+- RTC.
+- IWDG, WWDG.
+
 ### Board:
 I'm using the **STM32f446RE** board with ARM Cortex M4 CPU. If you're using other STM32 board be aware that things may not work on your board and you must change files and settings.
 
