@@ -21,4 +21,4 @@ For each measurements, we actually need four interrupts to happen:
 3. Measure another timestamp of falling edge, substract them to eventually get the distance. *Theoretically you can set a PWM input measurement.*
 4. Return 0 when overflow occurs. *TODO: Better handling of timeouts*
 
-*In this example we are using `__io_putchar` to send chars with printf function.*
+*In this example we are using `__io_putchar` to send chars with printf function.* **Please notice that using printf inside interrupts is not a good option,it's non-reentrant and not thread-safe.**
