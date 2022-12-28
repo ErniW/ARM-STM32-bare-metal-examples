@@ -54,3 +54,5 @@ In terminal type:
 `make compile`
 
 `make upload`
+
+or `make compile upload`
